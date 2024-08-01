@@ -1,8 +1,8 @@
-﻿namespace Bookify.Domain.Apartment
+﻿namespace Bookify.Domain.Apartments
 {
     public enum Amenity
     {
-        Wifi=1,
+        Wifi = 1,
         AirConditioning,
         Parking,
         PetFriday,
