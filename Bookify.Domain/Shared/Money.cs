@@ -14,6 +14,6 @@
 
         public static Money Zero(Currency currency) => new(0, currency);
 
-        public bool IsZero()=>this==Zero(Currency);
+        public bool IsZero()=> this == Zero(Currency);
     }
 }

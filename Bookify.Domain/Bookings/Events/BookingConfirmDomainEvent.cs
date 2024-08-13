@@ -2,5 +2,5 @@
 
 namespace Bookify.Domain.Bookings.Events
 {
-    public record BookingConfirmDomainEvent(Guid id): IDomainEvent;
+    public sealed record BookingConfirmedDomainEvent(Guid BookingId) : IDomainEvent;
 }
