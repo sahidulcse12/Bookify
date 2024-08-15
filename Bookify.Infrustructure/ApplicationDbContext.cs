@@ -1,4 +1,6 @@
-﻿using Bookify.Domain.Abstractions;
+﻿using Bookify.Application.Exceptions;
+using Bookify.Domain.Abstractions;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 
@@ -6,7 +8,12 @@ namespace Bookify.Infrustructure
 {
     public sealed class ApplicationDbContext : DbContext, IUnitOfWork
     {
-        public ApplicationDbContext(DbContextOptions options) : base(options) { }
+        private readonly IPublisher _publisher;
+
+        public ApplicationDbContext(DbContextOptions options, IPublisher publisher) : base(options) 
+        {
+            _publisher = publisher;
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -17,7 +24,39 @@ namespace Bookify.Infrustructure
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            return 1;
+            try
+            {
+                var result = await base.SaveChangesAsync(cancellationToken);
+
+                await PublisherDomainEventAsync();
+
+                return result;
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                throw new ConcurrencyException("Concurrency exception occurred.", ex);
+            }
+        }
+
+        private async Task  PublisherDomainEventAsync()
+        {
+            var domainEvents = ChangeTracker
+                .Entries<Entity>()
+                .Select(entry => entry.Entity)
+                .SelectMany(entity =>
+                {
+                    var domainEvents = entity.GetDomainEvents();
+
+                    entity.ClearDomainEvents();
+
+                    return domainEvents;
+                })
+                .ToList();
+
+            foreach (var domainEvent in domainEvents)
+            {
+                await _publisher.Publish(domainEvent);
+            }
         }
 
     }
