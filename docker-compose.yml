@@ -5,8 +5,8 @@ services:
     image: ${DOCKER_REGISTRY-}bookifyapi
     container_name: Bookify.Api
     build:
-      context: .
-      dockerfile: src/Bookify.Api/Dockerfile
+      context: D:\Bookify # This refers to D:\Bookify
+      dockerfile: Bookify.Api/Dockerfile  # This path should be relative to the context
     depends_on:
       - bookify-db
 
@@ -21,3 +21,4 @@ services:
       - ./.containers/database:/var/lib/postgresql/data
     ports:
       - 5432:5432
+
