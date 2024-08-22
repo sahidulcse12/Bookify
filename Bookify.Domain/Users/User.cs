@@ -28,5 +28,10 @@ namespace Bookify.Domain.Users
             user.RaiseDomainEvents(new UserCreatedDomainEvents(user.Id));
             return user;
         }
+
+        public void SetIdentityId(string identityId)
+        {
+            IdentityId = identityId;
+        }
     }
 }

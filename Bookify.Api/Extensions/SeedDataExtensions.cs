@@ -13,6 +13,7 @@ namespace Bookify.Api.Extensions
             using IServiceScope scope = app.ApplicationServices.CreateScope();
 
             ISqlConnectionFactory sqlConnectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
+
             using IDbConnection connection = sqlConnectionFactory.CreateConnection();
 
             var faker = new Faker();

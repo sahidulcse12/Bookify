@@ -1,18 +1,23 @@
-﻿using Bookify.Domain.Users;
+﻿using Dapper;
+using Bookify.Domain.Users;
 using Bookify.Domain.Bookings;
 using Bookify.Domain.Apartments;
+using Bookify.Domain.Abstractions;
+using Bookify.Infrustructure.Data;
 using Bookify.Infrustructure.Email;
 using Bookify.Infrustructure.Clock;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Bookify.Infrustructure.Repositories;
+using Bookify.Infrustructure.Authentication;
+using Bookify.Application.Abstractions.Data;
 using Bookify.Application.Abstractions.Clock;
 using Bookify.Application.Abstractions.Email;
 using Microsoft.Extensions.DependencyInjection;
-using Bookify.Domain.Abstractions;
-using Bookify.Application.Abstractions.Data;
-using Bookify.Infrustructure.Data;
-using Dapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
+using Bookify.Application.Abstractions.Authentication;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Bookify.Infrustructure
 {
@@ -25,7 +30,15 @@ namespace Bookify.Infrustructure
             service.AddTransient<IDateTimeProvider, DateTimeProvider>();
             service.AddTransient<IEmailService, EmailServices>();
 
-            var connectionString = 
+            AddPersistance(service, configuration);
+            AddAuthentication(service, configuration);
+
+            return service;
+        }
+
+        public static void AddPersistance(IServiceCollection service, IConfiguration configuration) 
+        {
+            var connectionString =
                 configuration.GetConnectionString("Database") ??
                 throw new ArgumentNullException(nameof(configuration));
 
@@ -36,15 +49,35 @@ namespace Bookify.Infrustructure
 
             service.AddScoped<IUserRepository, UserRepository>();
             service.AddScoped<IApartmentRepository, ApartmentRepository>();
-            service.AddScoped<IBookingRepository,BookingRepository>();
+            service.AddScoped<IBookingRepository, BookingRepository>();
             service.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ApplicationDbContext>());
 
-            service.AddSingleton<ISqlConnectionFactory>(_=>
+            service.AddSingleton<ISqlConnectionFactory>(_ =>
             new SqlConnectionFactory(connectionString));
 
             SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
-
-            return service;
         }
+
+        public static void AddAuthentication(IServiceCollection service, IConfiguration configuration)
+        {
+            service
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer();
+
+            service.AddTransient<AdminAuthorizationDelegatingHandler>();
+
+            service.Configure<AuthenticationOptions>(configuration.GetSection("Authentication"));
+            service.Configure<KeycloakOptions>(configuration.GetSection("Keycloak"));
+            service.ConfigureOptions<JwtBearerOptionsSetup>();
+
+            service.AddHttpClient<IAuthenticationService, AuthenticationService>((serviceProvider, httpClient) =>
+            {
+                KeycloakOptions keycloakOptions = serviceProvider.GetRequiredService<IOptions<KeycloakOptions>>().Value;
+
+                httpClient.BaseAddress = new Uri(keycloakOptions.AdminUrl);
+            })
+            .AddHttpMessageHandler<AdminAuthorizationDelegatingHandler>();
+        }
+
     }
 }
