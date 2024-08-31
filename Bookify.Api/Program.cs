@@ -21,7 +21,7 @@ if (app.Environment.IsDevelopment())
 
     app.UseSwaggerUI();
 
-    app.SeedData();
+    //app.SeedData();
 }
 
 app.UseHttpsRedirection();

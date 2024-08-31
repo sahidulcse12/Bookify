@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Bookify.Infrustructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Add_User_IdentityId : Migration
+    public partial class bookifydatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

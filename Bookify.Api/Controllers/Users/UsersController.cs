@@ -1,12 +1,11 @@
-﻿using Bookify.Application.Users.RegisterUser;
-using Bookify.Domain.Abstractions;
-using MediatR;
-using Microsoft.AspNetCore.Http;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Bookify.Domain.Abstractions;
+using Bookify.Application.Users.RegisterUser;
 
 namespace Bookify.Api.Controllers.Users
 {
-    [Route("api/user")]
+    [Route("api/users")]
     [ApiController]
     public class UsersController : ControllerBase
     {
@@ -22,9 +21,9 @@ namespace Bookify.Api.Controllers.Users
             CancellationToken cancellationToken)
         {
             var command = new RegisterUserCommand(
+                request.Email,
                 request.FirstName,
                 request.LastName,
-                request.Email,
                 request.Password);
 
             Result<Guid> result = await _sender.Send(command);

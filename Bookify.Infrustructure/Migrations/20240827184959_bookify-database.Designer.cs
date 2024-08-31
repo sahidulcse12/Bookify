@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Bookify.Infrustructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240822122736_Add_User_IdentityId")]
-    partial class Add_User_IdentityId
+    [Migration("20240827184959_bookify-database")]
+    partial class bookifydatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

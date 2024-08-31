@@ -25,12 +25,12 @@ namespace Bookify.Infrustructure.Authentication
 
             userRepresentationModel.Credentials = new CredentialRepresentationModel[]
             {
-            new()
-            {
-                Value = password,
-                Temporary = false,
-                Type = PasswordCredentialType
-            }
+                new()
+                {
+                    Value = password,
+                    Temporary = false,
+                    Type = PasswordCredentialType
+                }
             };
 
             HttpResponseMessage response = await _httpClient.PostAsJsonAsync(
