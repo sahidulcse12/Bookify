@@ -34,7 +34,7 @@ namespace Bookify.Application.Abstractions.Behaviors
             }
             catch (Exception ex)
             {
-                _logger.LogInformation("Command {Command} processed failed",name);
+                _logger.LogInformation("Command {Command} processed failed : {exception}",name,ex.ToString());
                 throw;
             }
 

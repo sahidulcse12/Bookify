@@ -36,10 +36,10 @@ namespace Bookify.Infrustructure.Authentication
         {
             var authorizationRequestParameters = new KeyValuePair<string, string>[]
             {
-            new("client_id", _keycloakOptions.AdminClientId),
-            new("client_secret", _keycloakOptions.AdminClientSecret),
-            new("scope", "openid email"),
-            new("grant_type", "client_credentials")
+                new("client_id", _keycloakOptions.AdminClientId),
+                new("client_secret", _keycloakOptions.AdminClientSecret),
+                new("scope", "openid email"),
+                new("grant_type", "client_credentials"),
             };
 
             var authorizationRequestContent = new FormUrlEncodedContent(authorizationRequestParameters);
@@ -57,7 +57,7 @@ namespace Bookify.Infrustructure.Authentication
 
             return await authorizationResponse
                         .Content
-                        .ReadFromJsonAsync<AuthorizationToken>(options: null, cancellationToken)
+                        .ReadFromJsonAsync<AuthorizationToken>()
                         ?? throw new ApplicationException();
 
         }
